@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_blog/screens/create_blog.dart';
+
+import '../utility.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -32,7 +35,10 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             FloatingActionButton(
-              onPressed: () {},
+              onPressed: () {
+//                Navigator.of(context).push(MaterialPageRoute(builder: (_) => CreateBlog()));
+                changeScreen(context, CreateBlog());
+              },
               child: Icon(Icons.add),
             ),
           ],
