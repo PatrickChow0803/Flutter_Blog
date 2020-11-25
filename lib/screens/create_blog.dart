@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_blog/services/crud.dart';
 import 'package:flutter_blog/utility.dart';
 
 class CreateBlog extends StatefulWidget {
@@ -8,6 +9,7 @@ class CreateBlog extends StatefulWidget {
 
 class _CreateBlogState extends State<CreateBlog> {
   String authorName, title, desc;
+  bool canPost = false;
 
   @override
   Widget build(BuildContext context) {
@@ -30,11 +32,17 @@ class _CreateBlogState extends State<CreateBlog> {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: IconButton(
-              icon: Icon(Icons.file_upload),
-              onPressed: () {},
-            ),
+            padding: const EdgeInsets.all(20.0),
+            child: InkWell(
+                onTap: () {
+                  setState(() {
+                    canPost = !canPost;
+                  });
+                },
+                child: Text(
+                  "POST",
+                  style: TextStyle(color: canPost ? Colors.white : Colors.orange),
+                )),
           )
         ],
       ),
