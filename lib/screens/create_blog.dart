@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_blog/services/crud.dart';
 import 'package:flutter_blog/utility.dart';
+import 'package:image_picker/image_picker.dart';
 
 class CreateBlog extends StatefulWidget {
   @override
@@ -10,6 +13,17 @@ class CreateBlog extends StatefulWidget {
 class _CreateBlogState extends State<CreateBlog> {
   String authorName, title, desc;
   bool canPost = false;
+
+  PickedFile _imageFile;
+  CrudMethods _crudMethods = new CrudMethods();
+
+  Future getImage() async {
+    final pickedFile = await ImagePicker().getImage(source: ImageSource.gallery);
+
+    setState(() {
+      _imageFile = pickedFile;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,17 +65,29 @@ class _CreateBlogState extends State<CreateBlog> {
           child: Column(
             children: [
               SizedBox(height: 10.0),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16.0),
-                height: 150,
-                width: getScreenWidth(context),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16.0),
-                ),
-                child: Icon(
-                  Icons.add_a_photo,
-                  color: getPrimaryColor(context),
+              GestureDetector(
+                onTap: () {
+                  getImage();
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                  height: 150,
+                  width: getScreenWidth(context),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                  // Determine whether or not to display the selected image  or the Icon
+                  child: _imageFile != null
+                      ? Image.file(
+                          // Converts PickedFile data type into a file data type that can be used
+                          File(_imageFile.path),
+                          fit: BoxFit.fill,
+                        )
+                      : Icon(
+                          Icons.add_a_photo,
+                          color: getPrimaryColor(context),
+                        ),
                 ),
               ),
               SizedBox(height: 10),
