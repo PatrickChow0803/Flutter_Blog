@@ -32,22 +32,6 @@ class _CreateBlogState extends State<CreateBlog> {
     });
   }
 
-  void uploadBlog() async {
-    // Uploading to FireBase Storage
-    if (_imageFile != null) {
-      setState(() {
-        _isLoading = !_isLoading;
-      });
-
-      _crudMethods.uploadAndCreateBlog(_imageFile.path, authorName.text, title.text, desc.text);
-
-      setState(() {
-        _isLoading = !_isLoading;
-      });
-      Navigator.pop(context);
-    } else {}
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,8 +58,21 @@ class _CreateBlogState extends State<CreateBlog> {
                 onTap: () {
                   setState(() {
                     canPost = !canPost;
-                    uploadBlog();
                   });
+                  // Uploading to FireBase Storage
+                  if (_imageFile != null) {
+                    setState(() {
+                      _isLoading = !_isLoading;
+                    });
+
+                    _crudMethods.uploadAndCreateBlog(
+                        _imageFile.path, authorName.text, title.text, desc.text);
+
+                    setState(() {
+                      _isLoading = !_isLoading;
+                    });
+                    Navigator.pop(context);
+                  } else {}
                 },
                 child: Text(
                   "POST",

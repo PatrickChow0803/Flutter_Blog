@@ -53,4 +53,8 @@ class CrudMethods {
       print(e.toString());
     }
   }
+
+  void getBlogs() async {
+    await accessFireStore.collection(BLOG).get();
+  }
 }
