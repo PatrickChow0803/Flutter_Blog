@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blog/services/crud.dart';
 import 'package:flutter_blog/utility.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:random_string/random_string.dart';
 
 class CreateBlog extends StatefulWidget {
   @override
@@ -23,6 +25,21 @@ class _CreateBlogState extends State<CreateBlog> {
     setState(() {
       _imageFile = pickedFile;
     });
+  }
+
+  void uploadBlog() async {
+    // Uploading to FireBase Storage
+    if (_imageFile != null) {
+      // Go to Firebase Storage's root directory and create a folder called blogImage
+      // Then make the file's name a random 9 character
+      Reference firebaseStorage =
+          FirebaseStorage.instance.ref('blogImage/${randomAlphaNumeric(9)}.jpg');
+
+//      var downloadUrl = await firebaseStorage.getDownloadURL();
+
+      final UploadTask task = firebaseStorage.putFile(File(_imageFile.path));
+//      print("This is the download URL: $downloadUrl");
+    } else {}
   }
 
   @override
@@ -51,6 +68,7 @@ class _CreateBlogState extends State<CreateBlog> {
                 onTap: () {
                   setState(() {
                     canPost = !canPost;
+                    uploadBlog();
                   });
                 },
                 child: Text(
@@ -79,10 +97,13 @@ class _CreateBlogState extends State<CreateBlog> {
                   ),
                   // Determine whether or not to display the selected image  or the Icon
                   child: _imageFile != null
-                      ? Image.file(
-                          // Converts PickedFile data type into a file data type that can be used
-                          File(_imageFile.path),
-                          fit: BoxFit.fill,
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(16.0),
+                          child: Image.file(
+                            // Converts PickedFile data type into a File data type that can be used
+                            File(_imageFile.path),
+                            fit: BoxFit.fill,
+                          ),
                         )
                       : Icon(
                           Icons.add_a_photo,
