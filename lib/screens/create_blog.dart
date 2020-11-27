@@ -38,38 +38,13 @@ class _CreateBlogState extends State<CreateBlog> {
       setState(() {
         _isLoading = !_isLoading;
       });
-      try {
-        // Go to Firebase Storage's root directory and create a folder called blogImage
-        // Then make the file's name a random 9 character and make a reference to this file
-        // A reference is a pointer to a file within your specified storage bucket.
-        // This can be a file that already exists, or one that does not exist.
-        String randomSuffix = randomAlphaNumeric(9) + '.jpg';
-        Reference firebaseStorage = FirebaseStorage.instance.ref('blogImage/$randomSuffix');
 
-        // Upload the file to FireBase Storage
-        final UploadTask task = firebaseStorage.putFile(File(_imageFile.path));
-        // Wait for the file to finish upload before attempting to get the downloadURL from the file
-        String downloadUrl = await (await task).ref.getDownloadURL();
-        print("This is the download URL: $downloadUrl");
+      _crudMethods.uploadAndCreateBlog(_imageFile.path, authorName.text, title.text, desc.text);
 
-        // Now upload the Blog information to FireBase FireStore
-        Blog blogData = new Blog(
-          imageUrl: downloadUrl,
-          authorName: authorName.text,
-          titleName: title.text,
-          description: desc.text,
-          timePosted: DateTime.now().millisecondsSinceEpoch,
-        );
-
-        _crudMethods.createBlog(blogData);
-
-        setState(() {
-          _isLoading = !_isLoading;
-        });
-        Navigator.pop(context);
-      } catch (e) {
-        print(e.toString());
-      }
+      setState(() {
+        _isLoading = !_isLoading;
+      });
+      Navigator.pop(context);
     } else {}
   }
 
@@ -157,11 +132,6 @@ class _CreateBlogState extends State<CreateBlog> {
                           TextField(
                             decoration: InputDecoration(hintText: "Author's Name"),
                             controller: authorName,
-                            onChanged: (value) {
-                              print(value);
-                              print("This Working?");
-                              print(authorName.text);
-                            },
                           ),
                           TextField(
                             decoration: InputDecoration(hintText: "Title"),
