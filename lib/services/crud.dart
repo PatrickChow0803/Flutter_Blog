@@ -54,7 +54,7 @@ class CrudMethods {
     }
   }
 
-  void getBlogs() async {
-    await accessFireStore.collection(BLOG).get();
+  Future<QuerySnapshot> getBlogs() async {
+    return await accessFireStore.collection(BLOG).get();
   }
 }

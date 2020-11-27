@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blog/screens/create_blog.dart';
+import 'package:flutter_blog/services/crud.dart';
 
 import '../utility.dart';
 
@@ -9,6 +11,20 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  CrudMethods crudMethods = new CrudMethods();
+
+  QuerySnapshot blogSnapshot;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    crudMethods.getBlogs().then((value) {
+      blogSnapshot = value;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
