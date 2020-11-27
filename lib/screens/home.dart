@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blog/models/blog.dart';
 import 'package:flutter_blog/screens/create_blog.dart';
 import 'package:flutter_blog/services/crud.dart';
+import 'package:flutter_blog/widgets/blog_tile.dart';
 
 import '../utility.dart';
 
@@ -15,14 +17,13 @@ class _HomePageState extends State<HomePage> {
 
   QuerySnapshot blogSnapshot;
 
+  List<BlogModel> listOfBlogs = [];
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
-    crudMethods.getBlogs().then((value) {
-      blogSnapshot = value;
-    });
+//    listOfBlogs = await crudMethods.getBlogs();
   }
 
   @override
@@ -51,7 +52,7 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             FloatingActionButton(
-              onPressed: () {
+              onPressed: () async {
 //                Navigator.of(context).push(MaterialPageRoute(builder: (_) => CreateBlog()));
                 changeScreen(context, CreateBlog());
               },
@@ -60,6 +61,16 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
+      body: blogSnapshot != null
+          ? Container(
+              child: CircularProgressIndicator(),
+            )
+          : ListView.builder(
+              itemBuilder: (_, index) {
+                return BlogTile(blogInfo: listOfBlogs[index]);
+              },
+              itemCount: listOfBlogs.length,
+            ),
     );
   }
 }

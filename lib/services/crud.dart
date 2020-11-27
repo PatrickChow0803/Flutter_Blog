@@ -10,7 +10,7 @@ class CrudMethods {
   FirebaseFirestore accessFireStore = FirebaseFirestore.instance;
   static const String BLOG = 'blogs';
 
-  Future<void> createBlog(Blog blogData) async {
+  Future<void> createBlog(BlogModel blogData) async {
     // Go to FireStore and go to the collection called 'blogs' and then add a snapshot with blogData as the fields
     accessFireStore.collection(BLOG).add({
       'imageUrl': blogData.imageUrl,
@@ -40,7 +40,7 @@ class CrudMethods {
       print("This is the download URL: $downloadUrl");
 
       // Now upload the Blog information to FireBase FireStore
-      Blog blogData = new Blog(
+      BlogModel blogData = new BlogModel(
         imageUrl: downloadUrl,
         authorName: authorName,
         titleName: title,
@@ -54,7 +54,15 @@ class CrudMethods {
     }
   }
 
-  Future<QuerySnapshot> getBlogs() async {
-    return await accessFireStore.collection(BLOG).get();
+  Future<List<BlogModel>> getBlogs() async {
+    List<BlogModel> blogs = [];
+    // go to FireStore and get all the documents in the BLOG collection, then for each DocumentSnapshot,
+    // convert them into a BlogModel so that they can be used.
+    accessFireStore.collection(BLOG).get().then((value) {
+      for (DocumentSnapshot blog in value.docs) {
+        blogs.add(BlogModel.fromSnapshot(blog));
+      }
+    });
+    return blogs;
   }
 }
