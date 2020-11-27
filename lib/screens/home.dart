@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blog/models/blog.dart';
+import 'package:flutter_blog/providers/blog.dart';
 import 'package:flutter_blog/screens/create_blog.dart';
 import 'package:flutter_blog/services/crud.dart';
 import 'package:flutter_blog/widgets/blog_tile.dart';
+import 'package:provider/provider.dart';
 
 import '../utility.dart';
 
@@ -15,19 +17,20 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   CrudMethods crudMethods = new CrudMethods();
 
-  QuerySnapshot blogSnapshot;
+  CollectionReference blogs = FirebaseFirestore.instance.collection('blogs');
 
-  List<BlogModel> listOfBlogs = [];
+  QuerySnapshot blogSnapshot;
+  Stream blogStream;
 
   @override
   void initState() {
     super.initState();
-
-//    listOfBlogs = await crudMethods.getBlogs();
+//    crudMethods.getBlogsStream();
   }
 
   @override
   Widget build(BuildContext context) {
+    final blogProvider = Provider.of<BlogProvider>(context);
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
@@ -65,11 +68,25 @@ class _HomePageState extends State<HomePage> {
           ? Container(
               child: CircularProgressIndicator(),
             )
-          : ListView.builder(
-              itemBuilder: (_, index) {
-                return BlogTile(blogInfo: listOfBlogs[index]);
+          : StreamBuilder<QuerySnapshot>(
+              stream: blogs.snapshots(),
+//              stream: crudMethods.getBlogsStream(),
+              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.hasError) {
+                  print('Something went wrong');
+                }
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  print("Loading");
+                }
+
+                return ListView.builder(
+                  itemBuilder: (_, index) {
+                    return BlogTile(blogInfo: blogProvider.listOfBlogs[index]);
+                  },
+                  itemCount: blogProvider.listOfBlogs.length,
+                );
               },
-              itemCount: listOfBlogs.length,
             ),
     );
   }

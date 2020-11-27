@@ -37,11 +37,13 @@ class BlogTile extends StatelessWidget {
               children: [
                 Text(
                   blogInfo.titleName,
+                  textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
                 ),
                 SizedBox(height: 6),
                 Text(
                   blogInfo.authorName,
+                  textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16),
                 ),
                 SizedBox(height: 6),

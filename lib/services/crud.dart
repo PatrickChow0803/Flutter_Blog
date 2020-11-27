@@ -65,4 +65,8 @@ class CrudMethods {
     });
     return blogs;
   }
+
+  Stream getBlogsStream() {
+    return accessFireStore.collection(BLOG).snapshots();
+  }
 }
