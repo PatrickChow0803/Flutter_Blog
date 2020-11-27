@@ -15,6 +15,7 @@ class CreateBlog extends StatefulWidget {
 class _CreateBlogState extends State<CreateBlog> {
   String authorName, title, desc;
   bool canPost = false;
+  bool _isLoading = false;
 
   PickedFile _imageFile;
   CrudMethods _crudMethods = new CrudMethods();
@@ -30,15 +31,26 @@ class _CreateBlogState extends State<CreateBlog> {
   void uploadBlog() async {
     // Uploading to FireBase Storage
     if (_imageFile != null) {
+      setState(() {
+        _isLoading = !_isLoading;
+      });
       // Go to Firebase Storage's root directory and create a folder called blogImage
-      // Then make the file's name a random 9 character
-      Reference firebaseStorage =
-          FirebaseStorage.instance.ref('blogImage/${randomAlphaNumeric(9)}.jpg');
+      // Then make the file's name a random 9 character and make a reference to this file
+      // A reference is a pointer to a file within your specified storage bucket.
+      // This can be a file that already exists, or one that does not exist.
+      String randomSuffix = randomAlphaNumeric(9) + '.jpg';
+      Reference firebaseStorage = FirebaseStorage.instance.ref('blogImage/$randomSuffix');
 
-//      var downloadUrl = await firebaseStorage.getDownloadURL();
-
+      // Upload the file to FireBase Storage
       final UploadTask task = firebaseStorage.putFile(File(_imageFile.path));
-//      print("This is the download URL: $downloadUrl");
+      // Wait for the file to finish upload before attempting to get the downloadURL from the file
+      String downloadUrl = await (await task).ref.getDownloadURL();
+      print("This is the download URL: $downloadUrl");
+
+      setState(() {
+        _isLoading = !_isLoading;
+      });
+      Navigator.pop(context);
     } else {}
   }
 
@@ -79,67 +91,72 @@ class _CreateBlogState extends State<CreateBlog> {
         ],
       ),
       body: SingleChildScrollView(
-        child: (Container(
-          child: Column(
-            children: [
-              SizedBox(height: 10.0),
-              GestureDetector(
-                onTap: () {
-                  getImage();
-                },
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16.0),
-                  height: 150,
-                  width: getScreenWidth(context),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16.0),
-                  ),
-                  // Determine whether or not to display the selected image  or the Icon
-                  child: _imageFile != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(16.0),
-                          child: Image.file(
-                            // Converts PickedFile data type into a File data type that can be used
-                            File(_imageFile.path),
-                            fit: BoxFit.fill,
-                          ),
-                        )
-                      : Icon(
-                          Icons.add_a_photo,
-                          color: getPrimaryColor(context),
-                        ),
-                ),
-              ),
-              SizedBox(height: 10),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: _isLoading
+            ? Container(
+                alignment: Alignment.center,
+                child: CircularProgressIndicator(),
+              )
+            : (Container(
                 child: Column(
                   children: [
-                    TextField(
-                      decoration: InputDecoration(hintText: "Author's Name"),
-                      onChanged: (input) {
-                        authorName = input;
+                    SizedBox(height: 10.0),
+                    GestureDetector(
+                      onTap: () {
+                        getImage();
                       },
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                        height: 150,
+                        width: getScreenWidth(context),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                        // Determine whether or not to display the selected image  or the Icon
+                        child: _imageFile != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(16.0),
+                                child: Image.file(
+                                  // Converts PickedFile data type into a File data type that can be used
+                                  File(_imageFile.path),
+                                  fit: BoxFit.fill,
+                                ),
+                              )
+                            : Icon(
+                                Icons.add_a_photo,
+                                color: getPrimaryColor(context),
+                              ),
+                      ),
                     ),
-                    TextField(
-                      decoration: InputDecoration(hintText: "Title"),
-                      onChanged: (input) {
-                        title = input;
-                      },
-                    ),
-                    TextField(
-                      decoration: InputDecoration(hintText: "Description"),
-                      onChanged: (input) {
-                        desc = input;
-                      },
-                    ),
+                    SizedBox(height: 10),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Column(
+                        children: [
+                          TextField(
+                            decoration: InputDecoration(hintText: "Author's Name"),
+                            onChanged: (input) {
+                              authorName = input;
+                            },
+                          ),
+                          TextField(
+                            decoration: InputDecoration(hintText: "Title"),
+                            onChanged: (input) {
+                              title = input;
+                            },
+                          ),
+                          TextField(
+                            decoration: InputDecoration(hintText: "Description"),
+                            onChanged: (input) {
+                              desc = input;
+                            },
+                          ),
+                        ],
+                      ),
+                    )
                   ],
                 ),
-              )
-            ],
-          ),
-        )),
+              )),
       ),
     );
   }
