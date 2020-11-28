@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_blog/models/blog.dart';
+import 'package:flutter_blog/providers/blog.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:random_string/random_string.dart';
 
@@ -66,7 +67,7 @@ class CrudMethods {
     return blogs;
   }
 
-  Stream getBlogsStream() {
+  Stream<QuerySnapshot> getBlogsStream() {
     return accessFireStore.collection(BLOG).snapshots();
   }
 }

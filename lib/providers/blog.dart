@@ -14,4 +14,9 @@ class BlogProvider with ChangeNotifier {
     listOfBlogs = await _crudMethods.getBlogs();
     notifyListeners();
   }
+
+  addBlog(BlogModel blog) {
+    listOfBlogs.add(blog);
+    notifyListeners();
+  }
 }

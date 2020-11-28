@@ -20,12 +20,12 @@ class _HomePageState extends State<HomePage> {
   CollectionReference blogs = FirebaseFirestore.instance.collection('blogs');
 
   QuerySnapshot blogSnapshot;
-  Stream blogStream;
+  Stream<QuerySnapshot> blogStream;
 
   @override
   void initState() {
     super.initState();
-//    crudMethods.getBlogsStream();
+    blogStream = crudMethods.getBlogsStream();
   }
 
   @override
@@ -69,8 +69,8 @@ class _HomePageState extends State<HomePage> {
               child: CircularProgressIndicator(),
             )
           : StreamBuilder<QuerySnapshot>(
-              stream: blogs.snapshots(),
-//              stream: crudMethods.getBlogsStream(),
+//              stream: blogs.snapshots(),
+              stream: blogStream,
               builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasError) {
                   print('Something went wrong');
@@ -84,7 +84,7 @@ class _HomePageState extends State<HomePage> {
                   itemBuilder: (_, index) {
                     return BlogTile(blogInfo: blogProvider.listOfBlogs[index]);
                   },
-                  itemCount: blogProvider.listOfBlogs.length,
+                  itemCount: snapshot.data.docs.length,
                 );
               },
             ),

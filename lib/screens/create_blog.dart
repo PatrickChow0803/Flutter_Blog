@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blog/models/blog.dart';
+import 'package:flutter_blog/providers/blog.dart';
 import 'package:flutter_blog/services/crud.dart';
 import 'package:flutter_blog/utility.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:random_string/random_string.dart';
 
 class CreateBlog extends StatefulWidget {
@@ -34,6 +36,7 @@ class _CreateBlogState extends State<CreateBlog> {
 
   @override
   Widget build(BuildContext context) {
+    final blogProvider = Provider.of<BlogProvider>(context);
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
@@ -67,6 +70,14 @@ class _CreateBlogState extends State<CreateBlog> {
 
                     _crudMethods.uploadAndCreateBlog(
                         _imageFile.path, authorName.text, title.text, desc.text);
+
+                    blogProvider.addBlog(BlogModel(
+                      imageUrl: _imageFile.path,
+                      authorName: authorName.text,
+                      titleName: title.text,
+                      description: desc.text,
+                      timePosted: DateTime.now().millisecondsSinceEpoch,
+                    ));
 
                     setState(() {
                       _isLoading = !_isLoading;
